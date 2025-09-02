@@ -264,13 +264,12 @@
 
     <!-- Hidden classic Formspree form (this is what actually sends the email) -->
     <form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
-     <input type="hidden" name="subject" id="fs_subject">
-<input type="hidden" name="message" id="fs_message">
-<input type="hidden" name="docx_link" id="fs_docx_link">
-<label>
-    <input type="email" name="email">
-  </label>
-    </form>
+  <input type="hidden" name="subject" id="fs_subject">
+  <input type="hidden" name="message" id="fs_message">
+  <input type="hidden" name="docx_link" id="fs_docx_link">
+  <!-- Required field -->
+  <input type="hidden" name="email" value="your@email.com">
+</form>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
@@ -532,6 +531,7 @@ const link = "Docx file will be attached separately or downloaded manually.";
 </body>
 </html>
 	
+
 
 
 
