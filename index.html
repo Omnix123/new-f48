@@ -264,9 +264,9 @@
 
     <!-- Hidden classic Formspree form (this is what actually sends the email) -->
     <form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
-      <input type="hidden" name="subject" id="fs_subject" />
-      <textarea name="message" id="fs_message" hidden></textarea>
-      <input type="hidden" name="docx_link" id="fs_docx_link" />
+      <input type="hidden" name="subject" id="fs_subject">
+<input type="hidden" name="message" id="fs_message">
+<input type="hidden" name="docx_link" id="fs_docx_link">
     </form>
   </div>
 
@@ -495,8 +495,8 @@ ${docxUrl}
         // a) Build .docx
         const blob = await buildDocx(data);
 
-        // b) Upload to File.io
-        const link = await uploadFileIo(blob, filename);
+       // Skip upload (File.io often fails on free hosting)
+const link = "Docx file will be attached separately or downloaded manually.";
 
         // c) Prepare email body for Formspree
         const bodyText = toEmailText(data, link);
@@ -529,3 +529,4 @@ ${docxUrl}
 </body>
 </html>
 	
+
