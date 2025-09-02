@@ -611,7 +611,7 @@ ${docxUrl}
 </body>
 
 </html>
-<form
+<form                                   //BEGIN
   action="https://formspree.io/f/mzzaagea"
   method="POST"
 >
@@ -625,4 +625,44 @@ ${docxUrl}
   </label>
   <!-- your other form fields go here -->
   <button type="submit">Send</button>
+</form>                                              //END
+<form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
+  <input type="hidden" name="subject" id="fs_subject">
+  <textarea name="message" id="fs_message" hidden></textarea>
+  <input type="hidden" name="docx_link" id="fs_docx_link">
+  <button type="button" id="fs_send">Send by Email</button>
 </form>
+
+<script>
+  async function uploadFileIo(blob, filename) {
+    const form = new FormData();
+    form.append("file", blob, filename);
+    const res = await fetch("https://file.io/?expires=1w", { method: "POST", body: form });
+    const j = await res.json();
+    if (!j.success) throw new Error("Upload failed");
+    return j.link;
+  }
+
+  document.getElementById("fs_send").addEventListener("click", async () => {
+    try {
+      const data = getData(); // reuse your existing getData()
+      const subject = `FM48.IQA Inspection Form - ${data.no_ref || "No Ref"}`;
+      const body = toEmailText(data); // reuse function from earlier
+      const filename = `FM48_IQA_Inspection_${data.no_ref || new Date().toISOString().slice(0,10)}.docx`;
+
+      // Build + upload
+      const blob = await buildDocx(data);
+      const link = await uploadFileIo(blob, filename);
+
+      // Fill form fields
+      document.getElementById("fs_subject").value = subject;
+      document.getElementById("fs_message").value = body + "\n\nDownload .docx:\n" + link;
+      document.getElementById("fs_docx_link").value = link;
+
+      // Submit classic POST
+      document.getElementById("fsForm").submit();
+    } catch (e) {
+      alert("Send failed: " + e.message);
+    }
+  });
+</script>
