@@ -266,27 +266,28 @@
       </div>
 
       <!-- This visible form posts to Formspree -->
-      <form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
-        <label>Subject</label>
-        <input type="text" name="_subject" id="fs_subject" required />
+<form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
+    <label>Subject</label>
+    <input type="text" name="_subject" id="fs_subject" required />
 
-        <label>Your email (optional, used by Formspree to reply)</label>
-        <input type="email" name="email" id="fs_reply" placeholder="you@example.com" />
+    <label>Your email (optional, used by Formspree to reply)</label>
+    <input type="email" name="email" id="fs_reply" placeholder="you@example.com" />
 
-        <label>Message</label>
-        <textarea name="message" id="fs_message" required></textarea>
+    <label>Message</label>
+    <textarea name="message" id="fs_message" required></textarea>
 
-        <!-- Individual fields (all visible, so not hidden) -->
-        <label>No. (yy/###)</label>
-        <input type="text" name="no_ref" id="fs_no_ref" />
+    <label>No. (yy/###)</label>
+    <input type="text" name="no_ref" id="fs_no_ref" />
 
-        <label>Port of Entry</label>
-        <input type="text" name="port_of_entry" id="fs_port" />
+    <label>Port of Entry</label>
+    <input type="text" name="port_of_entry" id="fs_port" />
 
-        <div class="controls">
-          <button type="submit">Send by Email</button>
-        </div>
-      </form>
+    <input type="text" name="_gotcha" style="display:none" />
+
+    <div class="controls">
+        <button type="submit">Send by Email</button>
+    </div>
+</form>
 
       <p class="note">
         If email fails, you can still download the .docx and attach it manually.
@@ -517,3 +518,4 @@ Section C: Vehicle check
 </body>
 </html>
 	
+
