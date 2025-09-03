@@ -32,258 +32,248 @@
 </head>
 <body>
   <div class="page">
-    <h1>FM48.IQA Hazardous Transportation Inspection Form</h1>
+    <form action="https://formspree.io/f/mzzaagea" method="POST">
+      <h1>FM48.IQA Hazardous Transportation Inspection Form</h1>
 
-    <div class="inline">
-      <div>No. (yy/###)</div>
-      <input type="text" id="no_ref" placeholder="e.g., 25/123" />
-    </div>
-
-    <div class="section">
-      <h2>Details of transporting company</h2>
-      <label>Name and physical address of the transport company:</label>
-      <textarea id="company_details" placeholder="Name and address..."></textarea>
       <div class="inline">
-        <div>Name</div>
-        <input type="text" id="company_name" />
+        <div>No. (yy/###)</div>
+        <input type="text" id="no_ref" name="no_ref" placeholder="e.g., 25/123" />
       </div>
-    </div>
 
-    <div class="section">
-      <h2>Section A: Inspector’s Details</h2>
-      <div class="row">
-        <div>
-          <label>Inspector’s Name</label>
-          <input type="text" id="inspector_name" />
-        </div>
-        <div>
-          <label>Signature (type name)</label>
-          <input type="text" id="inspector_signature" placeholder="Signature" />
+      <div class="section">
+        <h2>Details of transporting company</h2>
+        <label>Name and physical address of the transport company:</label>
+        <textarea id="company_details" name="company_details" placeholder="Name and address..."></textarea>
+        <div class="inline">
+          <div>Name</div>
+          <input type="text" id="company_name" name="company_name" />
         </div>
       </div>
-      <div class="row">
-        <div>
-          <label>Port of Entry</label>
-          <input type="text" id="port_of_entry" />
+
+      <div class="section">
+        <h2>Section A: Inspector’s Details</h2>
+        <div class="row">
+          <div>
+            <label>Inspector’s Name</label>
+            <input type="text" id="inspector_name" name="inspector_name" />
+          </div>
+          <div>
+            <label>Signature (type name)</label>
+            <input type="text" id="inspector_signature" name="inspector_signature" placeholder="Signature" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Port of Entry</label>
+            <input type="text" id="port_of_entry" name="port_of_entry" />
+          </div>
+          <div class="row">
+            <div>
+              <label>Date</label>
+              <input type="date" id="inspection_date" name="inspection_date" />
+            </div>
+            <div>
+              <label>Time</label>
+              <input type="time" id="inspection_time" name="inspection_time" />
+            </div>
+          </div>
+        </div>
+
+        <h3>Endorsing Officer (for restricted hazardous materials / waste)</h3>
+        <div class="row">
+          <div>
+            <label>Name of Inspector</label>
+            <input type="text" id="endorse1_name" name="endorse1_name" />
+          </div>
+          <div>
+            <label>Signature (type name)</label>
+            <input type="text" id="endorse1_signature" name="endorse1_signature" />
+          </div>
         </div>
         <div class="row">
           <div>
             <label>Date</label>
-            <input type="date" id="inspection_date" />
+            <input type="date" id="endorse1_date" name="endorse1_date" />
           </div>
           <div>
             <label>Time</label>
-            <input type="time" id="inspection_time" />
+            <input type="time" id="endorse1_time" name="endorse1_time" />
+          </div>
+        </div>
+        <label>Inspection Comments</label>
+        <textarea id="endorse1_comments" name="endorse1_comments"></textarea>
+
+        <h3>Endorsing Officer (Final Destination)</h3>
+        <div class="row">
+          <div>
+            <label>Name of Inspector</label>
+            <input type="text" id="endorse2_name" name="endorse2_name" />
+          </div>
+          <div>
+            <label>Signature (type name)</label>
+            <input type="text" id="endorse2_signature" name="endorse2_signature" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Date</label>
+            <input type="date" id="endorse2_date" name="endorse2_date" />
+          </div>
+          <div>
+            <label>Time</label>
+            <input type="time" id="endorse2_time" name="endorse2_time" />
+          </div>
+        </div>
+        <label>Inspection Comments</label>
+        <textarea id="endorse2_comments" name="endorse2_comments"></textarea>
+      </div>
+
+      <div class="section">
+        <h2>Section B</h2>
+        <h3>Details of vehicle carrying hazardous substances</h3>
+        <div class="row">
+          <div>
+            <label>Name of driver</label>
+            <input type="text" id="driver_name" name="driver_name" />
+          </div>
+          <div>
+            <label>Cell/Tell No</label>
+            <input type="text" id="driver_phone" name="driver_phone" />
+          </div>
+        </div>
+
+        <h3>Vehicle Registration Number(s):</h3>
+        <div class="row-3">
+          <div>
+            <label>Rigid</label>
+            <input type="text" id="reg_rigid" name="reg_rigid" />
+          </div>
+          <div>
+            <label>Horse</label>
+            <input type="text" id="reg_horse" name="reg_horse" />
+          </div>
+          <div>
+            <label>Trailer 1</label>
+            <input type="text" id="reg_trailer1" name="reg_trailer1" />
+          </div>
+          <div>
+            <label>Trailer 2</label>
+            <input type="text" id="reg_trailer2" name="reg_trailer2" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Make</label>
+            <input type="text" id="vehicle_make" name="vehicle_make" />
+          </div>
+          <div>
+            <label>Name of substance</label>
+            <input type="text" id="substance_name" name="substance_name" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Hazard class</label>
+            <input type="text" id="hazard_class" name="hazard_class" />
+          </div>
+          <div>
+            <label>Net weight (Tonnes)</label>
+            <input type="number" step="0.001" id="net_weight" name="net_weight" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="full">
+            <label>Amount due US$</label>
+            <input type="text" id="amount_due" name="amount_due" />
           </div>
         </div>
       </div>
 
-      <h3>Endorsing Officer (for restricted hazardous materials / waste)</h3>
-      <div class="row">
-        <div>
-          <label>Name of Inspector</label>
-          <input type="text" id="endorse1_name" />
-        </div>
-        <div>
-          <label>Signature (type name)</label>
-          <input type="text" id="endorse1_signature" />
-        </div>
-      </div>
-      <div class="row">
-        <div>
-          <label>Date</label>
-          <input type="date" id="endorse1_date" />
-        </div>
-        <div>
-          <label>Time</label>
-          <input type="time" id="endorse1_time" />
-        </div>
-      </div>
-      <label>Inspection Comments</label>
-      <textarea id="endorse1_comments"></textarea>
-
-      <h3>Endorsing Officer (Final Destination)</h3>
-      <div class="row">
-        <div>
-          <label>Name of Inspector</label>
-          <input type="text" id="endorse2_name" />
-        </div>
-        <div>
-          <label>Signature (type name)</label>
-          <input type="text" id="endorse2_signature" />
-        </div>
-      </div>
-      <div class="row">
-        <div>
-          <label>Date</label>
-          <input type="date" id="endorse2_date" />
-        </div>
-        <div>
-          <label>Time</label>
-          <input type="time" id="endorse2_time" />
-        </div>
-      </div>
-      <label>Inspection Comments</label>
-      <textarea id="endorse2_comments"></textarea>
-    </div>
-
-    <div class="section">
-      <h2>Section B</h2>
-      <h3>Details of vehicle carrying hazardous substances</h3>
-      <div class="row">
-        <div>
-          <label>Name of driver</label>
-          <input type="text" id="driver_name" />
-        </div>
-        <div>
-          <label>Cell/Tell No</label>
-          <input type="text" id="driver_phone" />
-        </div>
-      </div>
-
-      <h3>Vehicle Registration Number(s):</h3>
-      <div class="row-3">
-        <div>
-          <label>Rigid</label>
-          <input type="text" id="reg_rigid" />
-        </div>
-        <div>
-          <label>Horse</label>
-          <input type="text" id="reg_horse" />
-        </div>
-        <div>
-          <label>Trailer 1</label>
-          <input type="text" id="reg_trailer1" />
-        </div>
-        <div>
-          <label>Trailer 2</label>
-          <input type="text" id="reg_trailer2" />
-        </div>
+      <div class="section">
+        <h2>Section C: Vehicle check</h2>
+        <table class="table" aria-label="Vehicle check">
+          <thead>
+            <tr>
+              <th style="width: 70%;">Check item</th>
+              <th style="width: 10%;">Yes</th>
+              <th style="width: 10%;">No</th>
+              <th style="width: 10%;">N/A</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1. The vessel has valid documents to prove its road worthiness, e.g. certificate of fitness</td>
+              <td><input type="radio" name="check_roadworthiness" value="Yes" /></td>
+              <td><input type="radio" name="check_roadworthiness" value="No" /></td>
+              <td><input type="radio" name="check_roadworthiness" value="N/A" checked /></td>
+            </tr>
+            <tr>
+              <td>2. In the case of a bulk tanker, the tank is intact--no Leaks</td>
+              <td><input type="radio" name="check_tanker_leaks" value="Yes" /></td>
+              <td><input type="radio" name="check_tanker_leaks" value="No" /></td>
+              <td><input type="radio" name="check_tanker_leaks" value="N/A" checked /></td>
+            </tr>
+            <tr>
+              <td>3. In the case of pre-packaged material, the packaging is intact</td>
+              <td><input type="radio" name="check_packaging_intact" value="Yes" /></td>
+              <td><input type="radio" name="check_packaging_intact" value="No" /></td>
+              <td><input type="radio" name="check_packaging_intact" value="N/A" checked /></td>
+            </tr>
+            <tr>
+              <td>4. The hazard warning panels are in place</td>
+              <td><input type="radio" name="check_panels_in_place" value="Yes" /></td>
+              <td><input type="radio" name="check_panels_in_place" value="No" /></td>
+              <td><input type="radio" name="check_panels_in_place" value="N/A" checked /></td>
+            </tr>
+            <tr>
+              <td>5. The hazard warning panels are correctly positioned</td>
+              <td><input type="radio" name="check_panels_positioned" value="Yes" /></td>
+              <td><input type="radio" name="check_panels_positioned" value="No" /></td>
+              <td><input type="radio" name="check_panels_positioned" value="N/A" checked /></td>
+            </tr>
+            <tr>
+              <td>6. The hazard warning panels are correctly labelled</td>
+              <td><input type="radio" name="check_panels_labelled" value="Yes" /></td>
+              <td><input type="radio" name="check_panels_labelled" value="No" /></td>
+              <td><input type="radio" name="check_panels_labelled" value="N/A" checked /></td>
+            </tr>
+            <tr>
+              <td>7. The Material Safety Datasheets (SDS) are readily available for use if necessary</td>
+              <td><input type="radio" name="check_sds_available" value="Yes" /></td>
+              <td><input type="radio" name="check_sds_available" value="No" /></td>
+              <td><input type="radio" name="check_sds_available" value="N/A" checked /></td>
+            </tr>
+            <tr>
+              <td>8. The UN number / GHS Labelling for the identification of the substance is in place and tallies with that in the SDS or TREM card</td>
+              <td><input type="radio" name="check_un_number" value="Yes" /></td>
+              <td><input type="radio" name="check_un_number" value="No" /></td>
+              <td><input type="radio" name="check_un_number" value="N/A" checked /></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div class="row">
-        <div>
-          <label>Make</label>
-          <input type="text" id="vehicle_make" />
-        </div>
-        <div>
-          <label>Name of substance</label>
-          <input type="text" id="substance_name" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Hazard class</label>
-          <input type="text" id="hazard_class" />
-        </div>
-        <div>
-          <label>Net weight (Tonnes)</label>
-          <input type="number" step="0.001" id="net_weight" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="full">
-          <label>Amount due US$</label>
-          <input type="text" id="amount_due" />
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Section C: Vehicle check</h2>
-      <table class="table" aria-label="Vehicle check">
-        <thead>
-          <tr>
-            <th style="width: 70%;">Check item</th>
-            <th style="width: 10%;">Yes</th>
-            <th style="width: 10%;">No</th>
-            <th style="width: 10%;">N/A</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1. The vessel has valid documents to prove its road worthiness, e.g. certificate of fitness</td>
-            <td><input type="radio" name="c1" value="Yes" /></td>
-            <td><input type="radio" name="c1" value="No" /></td>
-            <td><input type="radio" name="c1" value="N/A" /></td>
-          </tr>
-          <tr>
-            <td>2. In the case of a bulk tanker, the tank is intact--no Leaks</td>
-            <td><input type="radio" name="c2" value="Yes" /></td>
-            <td><input type="radio" name="c2" value="No" /></td>
-            <td><input type="radio" name="c2" value="N/A" /></td>
-          </tr>
-          <tr>
-            <td>3. In the case of pre-packaged material, the packaging is intact</td>
-            <td><input type="radio" name="c3" value="Yes" /></td>
-            <td><input type="radio" name="c3" value="No" /></td>
-            <td><input type="radio" name="c3" value="N/A" /></td>
-          </tr>
-          <tr>
-            <td>4. The hazard warning panels are in place</td>
-            <td><input type="radio" name="c4" value="Yes" /></td>
-            <td><input type="radio" name="c4" value="No" /></td>
-            <td><input type="radio" name="c4" value="N/A" /></td>
-          </tr>
-          <tr>
-            <td>5. The hazard warning panels are correctly positioned</td>
-            <td><input type="radio" name="c5" value="Yes" /></td>
-            <td><input type="radio" name="c5" value="No" /></td>
-            <td><input type="radio" name="c5" value="N/A" /></td>
-          </tr>
-          <tr>
-            <td>6. The hazard warning panels are correctly labelled</td>
-            <td><input type="radio" name="c6" value="Yes" /></td>
-            <td><input type="radio" name="c6" value="No" /></td>
-            <td><input type="radio" name="c6" value="N/A" /></td>
-          </tr>
-          <tr>
-            <td>7. The Material Safety Datasheets (SDS) are readily available for use if necessary</td>
-            <td><input type="radio" name="c7" value="Yes" /></td>
-            <td><input type="radio" name="c7" value="No" /></td>
-            <td><input type="radio" name="c7" value="N/A" /></td>
-          </tr>
-          <tr>
-            <td>8. The UN number / GHS Labelling for the identification of the substance is in place and tallies with that in the SDS or TREM card</td>
-            <td><input type="radio" name="c8" value="Yes" /></td>
-            <td><input type="radio" name="c8" value="No" /></td>
-            <td><input type="radio" name="c8" value="N/A" /></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="section">
-      <h2>Submission</h2>
-      <p>Click "Prepare Email" to review the content, then click "Send by Email" to submit.</p>
-      
-      <div class="controls">
-        <button id="prepareBtn" type="button">Prepare Email</button>
-        <button id="downloadDocxBtn" type="button" class="secondary">Download .docx</button>
-      </div>
-
-      <form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
+      <div class="section">
+        <h2>Submission</h2>
+        <p>Please provide your email address. Click "Submit Form" to send. You can also download a Word document copy for your records.</p>
         
-        <label for="fs_subject">Subject</label>
-        <input type="text" name="_subject" id="fs_subject" required />
+        <label for="submitter_email">Your Email (for replies)</label>
+        <input type="email" id="submitter_email" name="_replyto" placeholder="you@example.com" required style="margin-bottom: 12px;">
 
-        <label for="fs_replyto">Your email (optional, for replies)</label>
-        <input type="email" name="_replyto" id="fs_replyto" placeholder="you@example.com" />
-
-        <label for="fs_message">Message (auto-filled after clicking 'Prepare Email')</label>
-        <textarea name="message" id="fs_message" required readonly placeholder="Click 'Prepare Email' above to generate the email content"></textarea>
-
-        <input type="text" name="_gotcha" style="display:none" />
+        <input type="hidden" name="_subject" value="New FM48.IQA Inspection Form Submission">
+        
+        <input type="text" name="_gotcha" style="display:none">
 
         <div class="controls">
-          <button type="submit">Send by Email</button>
+          <button type="submit">Submit Form</button>
+          <button id="downloadDocxBtn" type="button" class="secondary">Download .docx</button>
         </div>
-      </form>
-
-      <p class="note">If email fails, you can still download the .docx and attach it manually.</p>
-    </div>
+        <p class="note">If email submission fails, please download the .docx file and email it manually.</p>
+      </div>
+    </form>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
@@ -326,75 +316,20 @@
         hazard_class: val("hazard_class"),
         net_weight: val("net_weight"),
         amount_due: val("amount_due"),
-        c1: getRadio("c1"), c2: getRadio("c2"), c3: getRadio("c3"), c4: getRadio("c4"),
-        c5: getRadio("c5"), c6: getRadio("c6"), c7: getRadio("c7"), c8: getRadio("c8"),
+        c1: getRadio("check_roadworthiness"),
+        c2: getRadio("check_tanker_leaks"),
+        c3: getRadio("check_packaging_intact"),
+        c4: getRadio("check_panels_in_place"),
+        c5: getRadio("check_panels_positioned"),
+        c6: getRadio("check_panels_labelled"),
+        c7: getRadio("check_sds_available"),
+        c8: getRadio("check_un_number"),
       };
     }
+    
+    // NOTE: The function that created the long email text and the 'prepareBtn' listener have been removed.
 
-    function makeEmailText(d) {
-      return `FM48.IQA Hazardous Transportation Inspection Form
---------------------------------------------------
-
-No. (yy/###): ${d.no_ref}
-
-## Details of transporting company
-- Name and physical address: ${d.company_details}
-- Name: ${d.company_name}
-
-## Section A: Inspector’s Details
-- Inspector’s Name: ${d.inspector_name}
-- Signature: ${d.inspector_signature}
-- Port of Entry: ${d.port_of_entry}
-- Date: ${d.inspection_date} Time: ${d.inspection_time}
-
-### Endorsing Officer (restricted hazardous materials / waste)
-- Name: ${d.endorse1_name}
-- Signature: ${d.endorse1_signature}
-- Date: ${d.endorse1_date} Time: ${d.endorse1_time}
-- Comments: ${d.endorse1_comments}
-
-### Endorsing Officer (Final Destination)
-- Name: ${d.endorse2_name}
-- Signature: ${d.endorse2_signature}
-- Date: ${d.endorse2_date} Time: ${d.endorse2_time}
-- Comments: ${d.endorse2_comments}
-
-## Section B: Vehicle Details
-- Driver Name: ${d.driver_name}
-- Cell/Tell No: ${d.driver_phone}
-- Reg: Rigid ${d.reg_rigid} | Horse ${d.reg_horse} | Trailer 1 ${d.reg_trailer1} | Trailer 2 ${d.reg_trailer2}
-- Make: ${d.vehicle_make}
-- Substance: ${d.substance_name}
-- Hazard class: ${d.hazard_class}
-- Net weight (Tonnes): ${d.net_weight}
-- Amount due US$: ${d.amount_due}
-
-## Section C: Vehicle Check
-1. Valid road worthiness documents: ${d.c1}
-2. Bulk tanker intact (no leaks): ${d.c2}
-3. Pre-packaged material intact: ${d.c3}
-4. Hazard warning panels in place: ${d.c4}
-5. Hazard warning panels correctly positioned: ${d.c5}
-6. Hazard warning panels correctly labelled: ${d.c6}
-7. SDS readily available: ${d.c7}
-8. UN number / GHS Labelling correct: ${d.c8}
-`;
-    }
-
-    // Prepare visible Formspree fields when the button is clicked
-    document.getElementById("prepareBtn").addEventListener("click", () => {
-      const d = getData();
-      const subject = `FM48.IQA Inspection Form - ${d.no_ref || "No Ref"}`;
-      const text = makeEmailText(d);
-
-      // Populate the simplified Formspree form
-      document.getElementById("fs_subject").value = subject;
-      document.getElementById("fs_message").value = text;
-
-      alert("Email content prepared below. Please review and click 'Send by Email'.");
-    });
-
-    // --- DOCX DOWNLOAD SCRIPT (UNCHANGED) ---
+    // --- DOCX DOWNLOAD SCRIPT (UNCHANGED from original, but check 'checkRow' names) ---
     async function buildDocx(data) {
       const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, HeadingLevel, AlignmentType } = docx;
       const title = new Paragraph({ text: "FM48.IQA Hazardous Transportation Inspection Form", heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER });
@@ -474,11 +409,12 @@ No. (yy/###): ${d.no_ref}
     document.getElementById("downloadDocxBtn").addEventListener("click", async () => {
       try {
         const d = getData();
-        const blob = await buildDocx(d);
         const filename = `FM48_IQA_Inspection_${d.no_ref || new Date().toISOString().slice(0,10)}.docx`;
+        const blob = await buildDocx(d);
         saveAs(blob, filename);
       } catch (e) {
         alert("Download failed: " + e.message);
+        console.error(e);
       }
     });
   </script>
