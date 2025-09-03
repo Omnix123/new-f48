@@ -16,7 +16,7 @@
     .row { display:grid; grid-template-columns:1fr 1fr; gap:var(--gap); }
     .row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--gap); }
     .full { grid-column:1 / -1; }
-    input[type="text"], input[type="date"], input[type="time"], input[type="number"], textarea { width:100%; padding:8px; border:1px solid #000; border-radius:2px; font-size:var(--normal); background:#fff; }
+    input[type="text"], input[type="date"], input[type="time"], input[type="number"], input[type="email"], textarea { width:100%; padding:8px; border:1px solid #000; border-radius:2px; font-size:var(--normal); background:#fff; }
     textarea { min-height:80px; resize:vertical; }
     .inline { display:grid; grid-template-columns:240px 1fr; gap:8px; align-items:center; margin:6px 0; }
     .section { border:1px solid var(--border); padding:12px; margin:16px 0; }
@@ -34,7 +34,6 @@
   <div class="page">
     <h1>FM48.IQA Hazardous Transportation Inspection Form</h1>
 
-    <!-- MAIN INPUTS (what the user fills) -->
     <div class="inline">
       <div>No. (yy/###)</div>
       <input type="text" id="no_ref" placeholder="e.g., 25/123" />
@@ -256,42 +255,34 @@
       </table>
     </div>
 
-    <!-- FORM TO SUBMIT (VISIBLE, NO HIDDEN FIELDS) -->
     <div class="section">
-      <h2>Email preview (this text is what will be sent)</h2>
-      <textarea id="email_preview" placeholder="Click 'Prepare Email' below to generate the email content" readonly></textarea>
+      <h2>Submission</h2>
+      <p>Click "Prepare Email" to review the content, then click "Send by Email" to submit.</p>
+      
       <div class="controls">
         <button id="prepareBtn" type="button">Prepare Email</button>
         <button id="downloadDocxBtn" type="button" class="secondary">Download .docx</button>
       </div>
 
-      <!-- This visible form posts to Formspree -->
-<form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
-    <label>Subject</label>
-    <input type="text" name="_subject" id="fs_subject" required />
+      <form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
+        
+        <label for="fs_subject">Subject</label>
+        <input type="text" name="_subject" id="fs_subject" required />
 
-    <label>Your email (optional, used by Formspree to reply)</label>
-    <input type="email" name="email" id="fs_reply" placeholder="you@example.com" />
-<input type="email" name="_replyto" id="fs_reply" placeholder="you@example.com" />
-    <label>Message</label>
-    <textarea name="message" id="fs_message" required></textarea>
+        <label for="fs_replyto">Your email (optional, for replies)</label>
+        <input type="email" name="_replyto" id="fs_replyto" placeholder="you@example.com" />
 
-    <label>No. (yy/###)</label>
-    <input type="text" name="no_ref" id="fs_no_ref" />
+        <label for="fs_message">Message (auto-filled after clicking 'Prepare Email')</label>
+        <textarea name="message" id="fs_message" required readonly placeholder="Click 'Prepare Email' above to generate the email content"></textarea>
 
-    <label>Port of Entry</label>
-    <input type="text" name="port_of_entry" id="fs_port" />
+        <input type="text" name="_gotcha" style="display:none" />
 
-    <input type="text" name="_gotcha" style="display:none" />
+        <div class="controls">
+          <button type="submit">Send by Email</button>
+        </div>
+      </form>
 
-    <div class="controls">
-        <button type="submit">Send by Email</button>
-    </div>
-</form>
-
-      <p class="note">
-        If email fails, you can still download the .docx and attach it manually.
-      </p>
+      <p class="note">If email fails, you can still download the .docx and attach it manually.</p>
     </div>
   </div>
 
@@ -300,8 +291,9 @@
   <script>
     function getRadio(name){
       const el = document.querySelector('input[name="'+name+'"]:checked');
-      return el ? el.value : "";
+      return el ? el.value : "N/A";
     }
+
     function getData() {
       const val = id => document.getElementById(id)?.value?.trim() || "";
       return {
@@ -341,32 +333,33 @@
 
     function makeEmailText(d) {
       return `FM48.IQA Hazardous Transportation Inspection Form
+--------------------------------------------------
 
 No. (yy/###): ${d.no_ref}
 
-Details of transporting company
+## Details of transporting company
 - Name and physical address: ${d.company_details}
 - Name: ${d.company_name}
 
-Section A: Inspector’s Details
+## Section A: Inspector’s Details
 - Inspector’s Name: ${d.inspector_name}
 - Signature: ${d.inspector_signature}
 - Port of Entry: ${d.port_of_entry}
 - Date: ${d.inspection_date} Time: ${d.inspection_time}
 
-Endorsing Officer (restricted hazardous materials / waste)
+### Endorsing Officer (restricted hazardous materials / waste)
 - Name: ${d.endorse1_name}
 - Signature: ${d.endorse1_signature}
 - Date: ${d.endorse1_date} Time: ${d.endorse1_time}
 - Comments: ${d.endorse1_comments}
 
-Endorsing Officer (Final Destination)
+### Endorsing Officer (Final Destination)
 - Name: ${d.endorse2_name}
 - Signature: ${d.endorse2_signature}
 - Date: ${d.endorse2_date} Time: ${d.endorse2_time}
 - Comments: ${d.endorse2_comments}
 
-Section B
+## Section B: Vehicle Details
 - Driver Name: ${d.driver_name}
 - Cell/Tell No: ${d.driver_phone}
 - Reg: Rigid ${d.reg_rigid} | Horse ${d.reg_horse} | Trailer 1 ${d.reg_trailer1} | Trailer 2 ${d.reg_trailer2}
@@ -376,53 +369,54 @@ Section B
 - Net weight (Tonnes): ${d.net_weight}
 - Amount due US$: ${d.amount_due}
 
-Section C: Vehicle check
-1: ${d.c1} 2: ${d.c2} 3: ${d.c3} 4: ${d.c4}
-5: ${d.c5} 6: ${d.c6} 7: ${d.c7} 8: ${d.c8}
+## Section C: Vehicle Check
+1. Valid road worthiness documents: ${d.c1}
+2. Bulk tanker intact (no leaks): ${d.c2}
+3. Pre-packaged material intact: ${d.c3}
+4. Hazard warning panels in place: ${d.c4}
+5. Hazard warning panels correctly positioned: ${d.c5}
+6. Hazard warning panels correctly labelled: ${d.c6}
+7. SDS readily available: ${d.c7}
+8. UN number / GHS Labelling correct: ${d.c8}
 `;
     }
 
-    // Prepare visible Formspree fields
+    // Prepare visible Formspree fields when the button is clicked
     document.getElementById("prepareBtn").addEventListener("click", () => {
       const d = getData();
       const subject = `FM48.IQA Inspection Form - ${d.no_ref || "No Ref"}`;
       const text = makeEmailText(d);
 
-      document.getElementById("email_preview").value = text;
-
+      // Populate the simplified Formspree form
       document.getElementById("fs_subject").value = subject;
       document.getElementById("fs_message").value = text;
-      document.getElementById("fs_no_ref").value = d.no_ref || "";
-      document.getElementById("fs_port").value = d.port_of_entry || "";
 
-      alert("Email content prepared below. Review and click 'Send by Email'.");
+      alert("Email content prepared below. Please review and click 'Send by Email'.");
     });
 
-    // Build and download docx locally (no upload)
+    // --- DOCX DOWNLOAD SCRIPT (UNCHANGED) ---
     async function buildDocx(data) {
       const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, HeadingLevel, AlignmentType } = docx;
       const title = new Paragraph({ text: "FM48.IQA Hazardous Transportation Inspection Form", heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER });
       const sectionTitle = t => new Paragraph({ text: t, heading: HeadingLevel.HEADING_2 });
       const makeRow = (label, value) => new Paragraph({ children: [ new TextRun({ text: label + ": ", bold: true }), new TextRun(value || "") ] });
-
       const checkRow = (num, text, v) => new TableRow({
         children: [
           new TableCell({ children: [ new Paragraph(`${num}. ${text}`) ] }),
-          new TableCell({ children: [ new Paragraph(v==="Yes" ? "✔" : "") ] }),
-          new TableCell({ children: [ new Paragraph(v==="No" ? "✔" : "") ] }),
-          new TableCell({ children: [ new Paragraph(v==="N/A" ? "✔" : "") ] }),
+          new TableCell({ children: [ new Paragraph(v==="Yes" ? "✔" : "") ], alignment: AlignmentType.CENTER }),
+          new TableCell({ children: [ new Paragraph(v==="No" ? "✔" : "") ], alignment: AlignmentType.CENTER }),
+          new TableCell({ children: [ new Paragraph(v==="N/A" ? "✔" : "") ], alignment: AlignmentType.CENTER }),
         ]
       });
-
       const vehicleTable = new Table({
         width: { size: 100, type: WidthType.PERCENTAGE },
         rows: [
           new TableRow({
             children: [
-              new TableCell({ children: [ new Paragraph({ text: "Check item" }) ] }),
-              new TableCell({ children: [ new Paragraph({ text: "Yes" }) ] }),
-              new TableCell({ children: [ new Paragraph({ text: "No" }) ] }),
-              new TableCell({ children: [ new Paragraph({ text: "N/A" }) ] }),
+              new TableCell({ children: [ new Paragraph({ text: "Check item", bold: true }) ] }),
+              new TableCell({ children: [ new Paragraph({ text: "Yes", bold: true }) ] }),
+              new TableCell({ children: [ new Paragraph({ text: "No", bold: true }) ] }),
+              new TableCell({ children: [ new Paragraph({ text: "N/A", bold: true }) ] }),
             ]
           }),
           checkRow(1, "The vessel has valid documents to prove its road worthiness, e.g. certificate of fitness", data.c1),
@@ -435,44 +429,29 @@ Section C: Vehicle check
           checkRow(8, "The UN number / GHS Labelling for the identification of the substance is in place and tallies with that in the SDS or TREM card", data.c8),
         ]
       });
-
       const doc = new Document({
         sections: [{
           children: [
             title,
             makeRow("No. (yy/###)", data.no_ref),
-
             sectionTitle("Details of transporting company"),
             makeRow("Name and physical address of the transport company", data.company_details),
             makeRow("Name", data.company_name),
-
             sectionTitle("Section A: Inspector’s Details"),
             makeRow("Inspector’s Name", data.inspector_name),
             makeRow("Signature", data.inspector_signature),
             makeRow("Port of Entry", data.port_of_entry),
-            new Paragraph({ children: [
-              new TextRun({ text: "Date: ", bold: true }), new TextRun(data.inspection_date || ""),
-              new TextRun({ text: " Time: ", bold: true }), new TextRun(data.inspection_time || "")
-            ]}),
-
+            new Paragraph({ children: [ new TextRun({ text: "Date: ", bold: true }), new TextRun(data.inspection_date || ""), new TextRun({ text: " Time: ", bold: true }), new TextRun(data.inspection_time || "") ]}),
             new Paragraph({ text: "Endorsing Officer (for restricted hazardous materials / waste)", bold: true }),
             makeRow("Name of Inspector", data.endorse1_name),
             makeRow("Signature", data.endorse1_signature),
-            new Paragraph({ children: [
-              new TextRun({ text: "Date: ", bold: true }), new TextRun(data.endorse1_date || ""),
-              new TextRun({ text: " Time: ", bold: true }), new TextRun(data.endorse1_time || "")
-            ]}),
+            new Paragraph({ children: [ new TextRun({ text: "Date: ", bold: true }), new TextRun(data.endorse1_date || ""), new TextRun({ text: " Time: ", bold: true }), new TextRun(data.endorse1_time || "") ]}),
             makeRow("Inspection Comments", data.endorse1_comments),
-
             new Paragraph({ text: "Endorsing Officer (Final Destination)", bold: true }),
             makeRow("Name of Inspector", data.endorse2_name),
             makeRow("Signature", data.endorse2_signature),
-            new Paragraph({ children: [
-              new TextRun({ text: "Date: ", bold: true }), new TextRun(data.endorse2_date || ""),
-              new TextRun({ text: " Time: ", bold: true }), new TextRun(data.endorse2_time || "")
-            ]}),
+            new Paragraph({ children: [ new TextRun({ text: "Date: ", bold: true }), new TextRun(data.endorse2_date || ""), new TextRun({ text: " Time: ", bold: true }), new TextRun(data.endorse2_time || "") ]}),
             makeRow("Inspection Comments", data.endorse2_comments),
-
             sectionTitle("Section B: Details of vehicle carrying hazardous substances"),
             makeRow("Name of driver", data.driver_name),
             makeRow("Cell/Tell No", data.driver_phone),
@@ -485,16 +464,13 @@ Section C: Vehicle check
             makeRow("Hazard class", data.hazard_class),
             makeRow("Net weight (Tonnes)", data.net_weight),
             makeRow("Amount due US$", data.amount_due),
-
             sectionTitle("Section C: Vehicle check"),
             vehicleTable
           ]
         }]
       });
-
       return await docx.Packer.toBlob(doc);
     }
-
     document.getElementById("downloadDocxBtn").addEventListener("click", async () => {
       try {
         const d = getData();
@@ -505,34 +481,6 @@ Section C: Vehicle check
         alert("Download failed: " + e.message);
       }
     });
-
-    // Keep form content in sync if user edits fields after preparing
-    ["input","change"].forEach(ev => {
-      document.addEventListener(ev, (e) => {
-        if (e.target && (e.target.closest(".section") || e.target.id==="no_ref")) {
-          // Optional: you can auto-update preview by calling prepare here
-        }
-      });
-    });
   </script>
 </body>
 </html>
-	
-<form
-  action="https://formspree.io/f/mzzaagea"
-  method="POST"
-  enctype="multipart/form-data"
->
-  <label>
-    Your email:
-    <input type="email" name="email">
-  </label>
-  <label>
-    Your file:
-    <input type="file" name="upload">
-  </label>
-  <button type="submit">Send</button>
-</form>
-
-
-
