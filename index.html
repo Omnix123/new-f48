@@ -26,10 +26,7 @@
     .controls { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
     button { appearance:none; border:1px solid #000; background:#1a73e8; color:#fff; padding:10px 14px; font-size:14px; border-radius:4px; cursor:pointer; }
     button.secondary { background:#666; }
-    button:disabled { opacity:.6; cursor:not-allowed; }
     .note { font-size:12px; color:#333; }
-    /* Accessible, offscreen honeypot (not display:none to keep bots seeing it) */
-    .hp-wrapper { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
     @media (max-width:640px){ .row, .row-3, .inline { grid-template-columns:1fr; } }
   </style>
 </head>
@@ -37,6 +34,7 @@
   <div class="page">
     <h1>FM48.IQA Hazardous Transportation Inspection Form</h1>
 
+    <!-- MAIN INPUTS (what the user fills) -->
     <div class="inline">
       <div>No. (yy/###)</div>
       <input type="text" id="no_ref" placeholder="e.g., 25/123" />
@@ -258,38 +256,53 @@
       </table>
     </div>
 
-    <div class="controls">
-      <button id="sendEmailBtn" type="button">Send by Email</button>
-      <button id="downloadDocxBtn" type="button" class="secondary">Download .docx</button>
-      <span class="note">Email will include a link to the generated .docx file.</span>
-    </div>
-
-    <!-- Formspree form: ensure your endpoint is correct -->
-    <form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
-      <!-- Subject and combined message -->
-      <input type="hidden" name="_subject" id="fs_subject">
-      <textarea name="message" id="fs_message" hidden></textarea>
-      <!-- Useful individual fields (these appear in email body) -->
-      <input type="hidden" name="no_ref" id="fs_no_ref">
-      <input type="hidden" name="port_of_entry" id="fs_port">
-      <input type="hidden" name="docx_link" id="fs_docx_link">
-      <!-- Offscreen honeypot (bots will fill, humans won't) -->
-      <div class="hp-wrapper" aria-hidden="true">
-        <label>Leave this field empty</label>
-        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+    <!-- FORM TO SUBMIT (VISIBLE, NO HIDDEN FIELDS) -->
+    <div class="section">
+      <h2>Email preview (this text is what will be sent)</h2>
+      <textarea id="email_preview" placeholder="Click 'Prepare Email' below to generate the email content" readonly></textarea>
+      <div class="controls">
+        <button id="prepareBtn" type="button">Prepare Email</button>
+        <button id="downloadDocxBtn" type="button" class="secondary">Download .docx</button>
       </div>
-    </form>
+
+      <!-- This visible form posts to Formspree -->
+      <form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
+        <label>Subject</label>
+        <input type="text" name="_subject" id="fs_subject" required />
+
+        <label>Your email (optional, used by Formspree to reply)</label>
+        <input type="email" name="email" id="fs_reply" placeholder="you@example.com" />
+
+        <label>Message</label>
+        <textarea name="message" id="fs_message" required></textarea>
+
+        <!-- Individual fields (all visible, so not hidden) -->
+        <label>No. (yy/###)</label>
+        <input type="text" name="no_ref" id="fs_no_ref" />
+
+        <label>Port of Entry</label>
+        <input type="text" name="port_of_entry" id="fs_port" />
+
+        <div class="controls">
+          <button type="submit">Send by Email</button>
+        </div>
+      </form>
+
+      <p class="note">
+        If email fails, you can still download the .docx and attach it manually.
+      </p>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <script>
+    function getRadio(name){
+      const el = document.querySelector('input[name="'+name+'"]:checked');
+      return el ? el.value : "";
+    }
     function getData() {
       const val = id => document.getElementById(id)?.value?.trim() || "";
-      const radios = name => {
-        const el = document.querySelector('input[name="'+name+'"]:checked');
-        return el ? el.value : "";
-      };
       return {
         no_ref: val("no_ref"),
         company_details: val("company_details"),
@@ -320,70 +333,76 @@
         hazard_class: val("hazard_class"),
         net_weight: val("net_weight"),
         amount_due: val("amount_due"),
-        c1: radios("c1"), c2: radios("c2"), c3: radios("c3"), c4: radios("c4"),
-        c5: radios("c5"), c6: radios("c6"), c7: radios("c7"), c8: radios("c8"),
+        c1: getRadio("c1"), c2: getRadio("c2"), c3: getRadio("c3"), c4: getRadio("c4"),
+        c5: getRadio("c5"), c6: getRadio("c6"), c7: getRadio("c7"), c8: getRadio("c8"),
       };
     }
 
-    function toEmailText(data, docxUrl) {
-      return `
-FM48.IQA Hazardous Transportation Inspection Form
+    function makeEmailText(d) {
+      return `FM48.IQA Hazardous Transportation Inspection Form
 
-No. (yy/###): ${data.no_ref}
+No. (yy/###): ${d.no_ref}
 
 Details of transporting company
-- Name and physical address: ${data.company_details}
-- Name: ${data.company_name}
+- Name and physical address: ${d.company_details}
+- Name: ${d.company_name}
 
 Section A: Inspector’s Details
-- Inspector’s Name: ${data.inspector_name}
-- Signature: ${data.inspector_signature}
-- Port of Entry: ${data.port_of_entry}
-- Date: ${data.inspection_date} Time: ${data.inspection_time}
+- Inspector’s Name: ${d.inspector_name}
+- Signature: ${d.inspector_signature}
+- Port of Entry: ${d.port_of_entry}
+- Date: ${d.inspection_date} Time: ${d.inspection_time}
 
 Endorsing Officer (restricted hazardous materials / waste)
-- Name: ${data.endorse1_name}
-- Signature: ${data.endorse1_signature}
-- Date: ${data.endorse1_date} Time: ${data.endorse1_time}
-- Comments: ${data.endorse1_comments}
+- Name: ${d.endorse1_name}
+- Signature: ${d.endorse1_signature}
+- Date: ${d.endorse1_date} Time: ${d.endorse1_time}
+- Comments: ${d.endorse1_comments}
 
 Endorsing Officer (Final Destination)
-- Name: ${data.endorse2_name}
-- Signature: ${data.endorse2_signature}
-- Date: ${data.endorse2_date} Time: ${data.endorse2_time}
-- Comments: ${data.endorse2_comments}
+- Name: ${d.endorse2_name}
+- Signature: ${d.endorse2_signature}
+- Date: ${d.endorse2_date} Time: ${d.endorse2_time}
+- Comments: ${d.endorse2_comments}
 
 Section B
-- Driver Name: ${data.driver_name}
-- Cell/Tell No: ${data.driver_phone}
-- Reg: Rigid ${data.reg_rigid} | Horse ${data.reg_horse} | Trailer 1 ${data.reg_trailer1} | Trailer 2 ${data.reg_trailer2}
-- Make: ${data.vehicle_make}
-- Substance: ${data.substance_name}
-- Hazard class: ${data.hazard_class}
-- Net weight (Tonnes): ${data.net_weight}
-- Amount due US$: ${data.amount_due}
+- Driver Name: ${d.driver_name}
+- Cell/Tell No: ${d.driver_phone}
+- Reg: Rigid ${d.reg_rigid} | Horse ${d.reg_horse} | Trailer 1 ${d.reg_trailer1} | Trailer 2 ${d.reg_trailer2}
+- Make: ${d.vehicle_make}
+- Substance: ${d.substance_name}
+- Hazard class: ${d.hazard_class}
+- Net weight (Tonnes): ${d.net_weight}
+- Amount due US$: ${d.amount_due}
 
 Section C: Vehicle check
-1: ${data.c1} 2: ${data.c2} 3: ${data.c3} 4: ${data.c4}
-5: ${data.c5} 6: ${data.c6} 7: ${data.c7} 8: ${data.c8}
-
-Download .docx (exact formatting):
-${docxUrl}
-`.trim();
+1: ${d.c1} 2: ${d.c2} 3: ${d.c3} 4: ${d.c4}
+5: ${d.c5} 6: ${d.c6} 7: ${d.c7} 8: ${d.c8}
+`;
     }
 
+    // Prepare visible Formspree fields
+    document.getElementById("prepareBtn").addEventListener("click", () => {
+      const d = getData();
+      const subject = `FM48.IQA Inspection Form - ${d.no_ref || "No Ref"}`;
+      const text = makeEmailText(d);
+
+      document.getElementById("email_preview").value = text;
+
+      document.getElementById("fs_subject").value = subject;
+      document.getElementById("fs_message").value = text;
+      document.getElementById("fs_no_ref").value = d.no_ref || "";
+      document.getElementById("fs_port").value = d.port_of_entry || "";
+
+      alert("Email content prepared below. Review and click 'Send by Email'.");
+    });
+
+    // Build and download docx locally (no upload)
     async function buildDocx(data) {
-      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, HeadingLevel } = docx;
-
-      const title = new Paragraph({
-        text: "FM48.IQA Hazardous Transportation Inspection Form",
-        heading: HeadingLevel.HEADING_1,
-        alignment: AlignmentType.CENTER,
-      });
-
+      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, HeadingLevel, AlignmentType } = docx;
+      const title = new Paragraph({ text: "FM48.IQA Hazardous Transportation Inspection Form", heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER });
       const sectionTitle = t => new Paragraph({ text: t, heading: HeadingLevel.HEADING_2 });
-      const makeRow = (label, value) =>
-        new Paragraph({ children: [ new TextRun({ text: label + ": ", bold: true }), new TextRun(value || "") ] });
+      const makeRow = (label, value) => new Paragraph({ children: [ new TextRun({ text: label + ": ", bold: true }), new TextRun(value || "") ] });
 
       const checkRow = (num, text, v) => new TableRow({
         children: [
@@ -418,7 +437,6 @@ ${docxUrl}
 
       const doc = new Document({
         sections: [{
-          properties: {},
           children: [
             title,
             makeRow("No. (yy/###)", data.no_ref),
@@ -449,5 +467,53 @@ ${docxUrl}
             makeRow("Name of Inspector", data.endorse2_name),
             makeRow("Signature", data.endorse2_signature),
             new Paragraph({ children: [
-              new TextRun({ text: "Date: ", bold: true }), new TextRun(data.endorse2_date
+              new TextRun({ text: "Date: ", bold: true }), new TextRun(data.endorse2_date || ""),
+              new TextRun({ text: " Time: ", bold: true }), new TextRun(data.endorse2_time || "")
+            ]}),
+            makeRow("Inspection Comments", data.endorse2_comments),
+
+            sectionTitle("Section B: Details of vehicle carrying hazardous substances"),
+            makeRow("Name of driver", data.driver_name),
+            makeRow("Cell/Tell No", data.driver_phone),
+            makeRow("Vehicle Registration Number(s) - Rigid", data.reg_rigid),
+            makeRow("Vehicle Registration Number(s) - Horse", data.reg_horse),
+            makeRow("Vehicle Registration Number(s) - Trailer 1", data.reg_trailer1),
+            makeRow("Vehicle Registration Number(s) - Trailer 2", data.reg_trailer2),
+            makeRow("Make", data.vehicle_make),
+            makeRow("Name of substance", data.substance_name),
+            makeRow("Hazard class", data.hazard_class),
+            makeRow("Net weight (Tonnes)", data.net_weight),
+            makeRow("Amount due US$", data.amount_due),
+
+            sectionTitle("Section C: Vehicle check"),
+            vehicleTable
+          ]
+        }]
+      });
+
+      return await docx.Packer.toBlob(doc);
+    }
+
+    document.getElementById("downloadDocxBtn").addEventListener("click", async () => {
+      try {
+        const d = getData();
+        const blob = await buildDocx(d);
+        const filename = `FM48_IQA_Inspection_${d.no_ref || new Date().toISOString().slice(0,10)}.docx`;
+        saveAs(blob, filename);
+      } catch (e) {
+        alert("Download failed: " + e.message);
+      }
+    });
+
+    // Keep form content in sync if user edits fields after preparing
+    ["input","change"].forEach(ev => {
+      document.addEventListener(ev, (e) => {
+        if (e.target && (e.target.closest(".section") || e.target.id==="no_ref")) {
+          // Optional: you can auto-update preview by calling prepare here
+        }
+      });
+    });
+  </script>
+</body>
+</html>
 	
