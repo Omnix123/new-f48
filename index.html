@@ -262,13 +262,30 @@
       <span class="note">Email will include a link to the generated .docx file.</span>
     </div>
 
-    <!-- Hidden classic Formspree form (this is what actually sends the email) -->
-    <form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
-  <input type="hidden" name="subject" id="fs_subject">
-  <input type="hidden" name="message" id="fs_message">
-  <input type="hidden" name="docx_link" id="fs_docx_link">
-  <!-- Required field -->
-  <input type="hidden" name="email" value="your@email.com">
+   <form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
+
+<!-- Route and reply -->
+
+<input type="hidden" name="email" id="erenmaruta@gmail.com" value="erenmaruta@gmail.com">
+
+<input type="hidden" name="_replyto" id="fs_replyto" value="erenmaruta@gmail.com">
+
+<!-- Better subject key -->
+
+<input type="hidden" name="_subject" id="fs_subject">
+
+<!-- Main body -->
+
+<textarea name="message" id="fs_message" hidden></textarea>
+
+<!-- Extra fields show up in the email body -->
+
+<input type="hidden" name="docx_link" id="fs_docx_link">
+
+<input type="hidden" name="no_ref_field" id="fs_no_ref">
+
+<input type="hidden" name="port_of_entry_field" id="fs_port">
+<input type="text" name="_gotcha" style="display:none">
 </form>
   </div>
 
@@ -425,14 +442,15 @@
 
     // 3) Upload generated .docx to File.io to get a shareable link
     async function uploadFileIo(blob, filename) {
-      const form = new FormData();
-      form.append("file", blob, filename);
-      const res = await fetch("https://file.io/?expires=1w", { method: "POST", body: form });
-      if (!res.ok) throw new Error("Upload failed");
-      const json = await res.json();
-      if (!json.success || !json.link) throw new Error("Upload failed: " + (json.error || "unknown"));
-      return json.link;
-    }
+const form = new FormData();
+form.append("file", blob, filename);
+const res = await fetch("https://tmpfiles.org/api/v1/upload", { method: "POST", body: form });
+if (!res.ok) throw new Error("Upload failed");
+const j = await res.json();
+// tmpfiles returns e.g. data.url like https://tmpfiles.org/abcd
+// The direct link is often the same URL; if not, use j.data.url
+return j.data?.url || j.url || "";
+}
 
     function toEmailText(data, docxUrl) {
       return `
@@ -503,13 +521,11 @@ const link = "Docx file will be attached separately or downloaded manually.";
         // c) Prepare email body for Formspree
         const bodyText = toEmailText(data, link);
 
-        // d) Fill hidden classic Formspree form fields
-        document.getElementById("fs_subject").value = subject;
-        document.getElementById("fs_message").value = bodyText;
-        document.getElementById("fs_docx_link").value = link;
-
-        // e) Submit classic POST (this avoids CORS issues)
-        document.getElementById("fsForm").submit();
+     document.getElementById("fs_subject").value = subject;
+document.getElementById("fs_message").value = bodyText;
+document.getElementById("fs_docx_link").value = link;
+document.getElementById("fs_no_ref").value = data.no_ref || "";
+document.getElementById("fs_port").value = data.port_of_entry || "";
 
         // Optional UX
         setTimeout(() => alert("Submitted. Check your email for the filled data and the .docx download link."), 500);
@@ -531,6 +547,7 @@ const link = "Docx file will be attached separately or downloaded manually.";
 </body>
 </html>
 	
+
 
 
 
