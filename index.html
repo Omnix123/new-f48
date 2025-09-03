@@ -28,6 +28,8 @@
     button.secondary { background:#666; }
     button:disabled { opacity:.6; cursor:not-allowed; }
     .note { font-size:12px; color:#333; }
+    /* Accessible, offscreen honeypot (not display:none to keep bots seeing it) */
+    .hp-wrapper { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
     @media (max-width:640px){ .row, .row-3, .inline { grid-template-columns:1fr; } }
   </style>
 </head>
@@ -211,7 +213,7 @@
             <td><input type="radio" name="c1" value="N/A" /></td>
           </tr>
           <tr>
-            <td>2. In the case of a bulk tanker, the tank is intact—no Leaks</td>
+            <td>2. In the case of a bulk tanker, the tank is intact--no Leaks</td>
             <td><input type="radio" name="c2" value="Yes" /></td>
             <td><input type="radio" name="c2" value="No" /></td>
             <td><input type="radio" name="c2" value="N/A" /></td>
@@ -257,42 +259,31 @@
     </div>
 
     <div class="controls">
-      <button id="sendEmailBtn">Send by Email</button>
-      <button id="downloadDocxBtn" class="secondary">Download .docx</button>
+      <button id="sendEmailBtn" type="button">Send by Email</button>
+      <button id="downloadDocxBtn" type="button" class="secondary">Download .docx</button>
       <span class="note">Email will include a link to the generated .docx file.</span>
     </div>
 
-   <form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
-
-<!-- Route and reply -->
-
-<input type="hidden" name="email" id="fs_Form" value="erenmaruta@gmail.com">
-
-<input type="hidden" name="_replyto" id="fs_replyto" value="noreply@formspree.io">
-
-<!-- Better subject key -->
-
-<input type="hidden" name="_subject" id="fs_subject">
-
-<!-- Main body -->
-
-<textarea name="message" id="fs_message" hidden></textarea>
-
-<!-- Extra fields show up in the email body -->
-
-<input type="hidden" name="docx_link" id="fs_docx_link">
-
-<input type="hidden" name="no_ref_field" id="fs_no_ref">
-
-<input type="hidden" name="port_of_entry_field" id="fs_port">
-<input type="text" name="_gotcha" style="display:none">
-</form>
+    <!-- Formspree form: ensure your endpoint is correct -->
+    <form id="fsForm" action="https://formspree.io/f/mzzaagea" method="POST">
+      <!-- Subject and combined message -->
+      <input type="hidden" name="_subject" id="fs_subject">
+      <textarea name="message" id="fs_message" hidden></textarea>
+      <!-- Useful individual fields (these appear in email body) -->
+      <input type="hidden" name="no_ref" id="fs_no_ref">
+      <input type="hidden" name="port_of_entry" id="fs_port">
+      <input type="hidden" name="docx_link" id="fs_docx_link">
+      <!-- Offscreen honeypot (bots will fill, humans won't) -->
+      <div class="hp-wrapper" aria-hidden="true">
+        <label>Leave this field empty</label>
+        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+      </div>
+    </form>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <script>
-    // 1) Collect form data from the page
     function getData() {
       const val = id => document.getElementById(id)?.value?.trim() || "";
       const radios = name => {
@@ -333,124 +324,6 @@
         c5: radios("c5"), c6: radios("c6"), c7: radios("c7"), c8: radios("c8"),
       };
     }
-
-    // 2) Build the .docx in-browser
-    async function buildDocx(data) {
-      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, HeadingLevel } = docx;
-
-      const title = new Paragraph({
-        text: "FM48.IQA Hazardous Transportation Inspection Form",
-        heading: HeadingLevel.HEADING_1,
-        alignment: AlignmentType.CENTER,
-      });
-
-      const sectionTitle = t => new Paragraph({ text: t, heading: HeadingLevel.HEADING_2 });
-      const makeRow = (label, value) =>
-        new Paragraph({ children: [ new TextRun({ text: label + ": ", bold: true }), new TextRun(value || "") ] });
-
-      const checkRow = (num, text, v) => new TableRow({
-        children: [
-          new TableCell({ children: [ new Paragraph(`${num}. ${text}`) ] }),
-          new TableCell({ children: [ new Paragraph(v==="Yes" ? "✔" : "") ] }),
-          new TableCell({ children: [ new Paragraph(v==="No" ? "✔" : "") ] }),
-          new TableCell({ children: [ new Paragraph(v==="N/A" ? "✔" : "") ] }),
-        ]
-      });
-
-      const vehicleTable = new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
-        rows: [
-          new TableRow({
-            children: [
-              new TableCell({ children: [ new Paragraph({ text: "Check item" }) ] }),
-              new TableCell({ children: [ new Paragraph({ text: "Yes" }) ] }),
-              new TableCell({ children: [ new Paragraph({ text: "No" }) ] }),
-              new TableCell({ children: [ new Paragraph({ text: "N/A" }) ] }),
-            ]
-          }),
-          checkRow(1, "The vessel has valid documents to prove its road worthiness, e.g. certificate of fitness", data.c1),
-          checkRow(2, "In the case of a bulk tanker, the tank is intact—no Leaks", data.c2),
-          checkRow(3, "In the case of pre-packaged material, the packaging is intact", data.c3),
-          checkRow(4, "The hazard warning panels are in place", data.c4),
-          checkRow(5, "The hazard warning panels are correctly positioned", data.c5),
-          checkRow(6, "The hazard warning panels are correctly labelled", data.c6),
-          checkRow(7, "The Material Safety Datasheets (SDS) are readily available for use if necessary", data.c7),
-          checkRow(8, "The UN number / GHS Labelling for the identification of the substance is in place and tallies with that in the SDS or TREM card", data.c8),
-        ]
-      });
-
-      const doc = new Document({
-        sections: [{
-          properties: {},
-          children: [
-            title,
-            makeRow("No. (yy/###)", data.no_ref),
-
-            sectionTitle("Details of transporting company"),
-            makeRow("Name and physical address of the transport company", data.company_details),
-            makeRow("Name", data.company_name),
-
-            sectionTitle("Section A: Inspector’s Details"),
-            makeRow("Inspector’s Name", data.inspector_name),
-            makeRow("Signature", data.inspector_signature),
-            makeRow("Port of Entry", data.port_of_entry),
-            new Paragraph({ children: [
-              new TextRun({ text: "Date: ", bold: true }), new TextRun(data.inspection_date || ""),
-              new TextRun({ text: " Time: ", bold: true }), new TextRun(data.inspection_time || "")
-            ]}),
-
-            new Paragraph({ text: "Endorsing Officer (for restricted hazardous materials / waste)", bold: true }),
-            makeRow("Name of Inspector", data.endorse1_name),
-            makeRow("Signature", data.endorse1_signature),
-            new Paragraph({ children: [
-              new TextRun({ text: "Date: ", bold: true }), new TextRun(data.endorse1_date || ""),
-              new TextRun({ text: " Time: ", bold: true }), new TextRun(data.endorse1_time || "")
-            ]}),
-            makeRow("Inspection Comments", data.endorse1_comments),
-
-            new Paragraph({ text: "Endorsing Officer (Final Destination)", bold: true }),
-            makeRow("Name of Inspector", data.endorse2_name),
-            makeRow("Signature", data.endorse2_signature),
-            new Paragraph({ children: [
-              new TextRun({ text: "Date: ", bold: true }), new TextRun(data.endorse2_date || ""),
-              new TextRun({ text: " Time: ", bold: true }), new TextRun(data.endorse2_time || "")
-            ]}),
-            makeRow("Inspection Comments", data.endorse2_comments),
-
-            sectionTitle("Section B: Details of vehicle carrying hazardous substances"),
-            makeRow("Name of driver", data.driver_name),
-            makeRow("Cell/Tell No", data.driver_phone),
-            makeRow("Vehicle Registration Number(s) - Rigid", data.reg_rigid),
-            makeRow("Vehicle Registration Number(s) - Horse", data.reg_horse),
-            makeRow("Vehicle Registration Number(s) - Trailer 1", data.reg_trailer1),
-            makeRow("Vehicle Registration Number(s) - Trailer 2", data.reg_trailer2),
-            makeRow("Make", data.vehicle_make),
-            makeRow("Name of substance", data.substance_name),
-            makeRow("Hazard class", data.hazard_class),
-            makeRow("Net weight (Tonnes)", data.net_weight),
-            makeRow("Amount due US$", data.amount_due),
-
-            sectionTitle("Section C: Vehicle check"),
-            vehicleTable
-          ]
-        }]
-      });
-
-      const blob = await docx.Packer.toBlob(doc);
-      return blob;
-    }
-
-    // 3) Upload generated .docx to File.io to get a shareable link
-    async function uploadFileIo(blob, filename) {
-const form = new FormData();
-form.append("file", blob, filename);
-const res = await fetch("https://tmpfiles.org/api/v1/upload", { method: "POST", body: form });
-if (!res.ok) throw new Error("Upload failed");
-const j = await res.json();
-// tmpfiles returns e.g. data.url like https://tmpfiles.org/abcd
-// The direct link is often the same URL; if not, use j.data.url
-return j.data?.url || j.url || "";
-}
 
     function toEmailText(data, docxUrl) {
       return `
@@ -499,66 +372,82 @@ ${docxUrl}
 `.trim();
     }
 
-    function setLoading(loading) {
-      document.getElementById("sendEmailBtn").disabled = loading;
-      document.getElementById("downloadDocxBtn").disabled = loading;
-    }
+    async function buildDocx(data) {
+      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, HeadingLevel } = docx;
 
-    // 4) Wire the buttons
-    document.getElementById("sendEmailBtn").addEventListener("click", async () => {
-      try {
-        setLoading(true);
-        const data = getData();
-        const subject = `FM48.IQA Inspection Form - ${data.no_ref || "No Ref"}`;
-        const filename = `FM48_IQA_Inspection_${data.no_ref || new Date().toISOString().slice(0,10)}.docx`;
+      const title = new Paragraph({
+        text: "FM48.IQA Hazardous Transportation Inspection Form",
+        heading: HeadingLevel.HEADING_1,
+        alignment: AlignmentType.CENTER,
+      });
 
-        // a) Build .docx
-        const blob = await buildDocx(data);
+      const sectionTitle = t => new Paragraph({ text: t, heading: HeadingLevel.HEADING_2 });
+      const makeRow = (label, value) =>
+        new Paragraph({ children: [ new TextRun({ text: label + ": ", bold: true }), new TextRun(value || "") ] });
 
-       // Skip upload (File.io often fails on free hosting)
-const link = "Docx file will be attached separately or downloaded manually.";
+      const checkRow = (num, text, v) => new TableRow({
+        children: [
+          new TableCell({ children: [ new Paragraph(`${num}. ${text}`) ] }),
+          new TableCell({ children: [ new Paragraph(v==="Yes" ? "✔" : "") ] }),
+          new TableCell({ children: [ new Paragraph(v==="No" ? "✔" : "") ] }),
+          new TableCell({ children: [ new Paragraph(v==="N/A" ? "✔" : "") ] }),
+        ]
+      });
 
-        // c) Prepare email body for Formspree
-        const bodyText = toEmailText(data, link);
+      const vehicleTable = new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({ children: [ new Paragraph({ text: "Check item" }) ] }),
+              new TableCell({ children: [ new Paragraph({ text: "Yes" }) ] }),
+              new TableCell({ children: [ new Paragraph({ text: "No" }) ] }),
+              new TableCell({ children: [ new Paragraph({ text: "N/A" }) ] }),
+            ]
+          }),
+          checkRow(1, "The vessel has valid documents to prove its road worthiness, e.g. certificate of fitness", data.c1),
+          checkRow(2, "In the case of a bulk tanker, the tank is intact--no Leaks", data.c2),
+          checkRow(3, "In the case of pre-packaged material, the packaging is intact", data.c3),
+          checkRow(4, "The hazard warning panels are in place", data.c4),
+          checkRow(5, "The hazard warning panels are correctly positioned", data.c5),
+          checkRow(6, "The hazard warning panels are correctly labelled", data.c6),
+          checkRow(7, "The Material Safety Datasheets (SDS) are readily available for use if necessary", data.c7),
+          checkRow(8, "The UN number / GHS Labelling for the identification of the substance is in place and tallies with that in the SDS or TREM card", data.c8),
+        ]
+      });
 
-     document.getElementById("fs_subject").value = subject;
-document.getElementById("fs_message").value = bodyText;
-document.getElementById("fs_docx_link").value = link;
-document.getElementById("fs_no_ref").value = data.no_ref || "";
-document.getElementById("fs_port").value = data.port_of_entry || "";
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: [
+            title,
+            makeRow("No. (yy/###)", data.no_ref),
 
-        // Optional UX
-        setTimeout(() => alert("Submitted. Check your email for the filled data and the .docx download link."), 500);
-      } catch (e) {
-        console.error(e);
-        alert("Send failed: " + e.message);
-      } finally {
-        setLoading(false);
-      }
-    });
+            sectionTitle("Details of transporting company"),
+            makeRow("Name and physical address of the transport company", data.company_details),
+            makeRow("Name", data.company_name),
 
-    document.getElementById("downloadDocxBtn").addEventListener("click", async () => {
-      const data = getData();
-      const blob = await buildDocx(data);
-      const filename = `FM48_IQA_Inspection_${data.no_ref || new Date().toISOString().slice(0,10)}.docx`;
-      saveAs(blob, filename);
-    });
-  </script>
-</body>
-</html>
+            sectionTitle("Section A: Inspector’s Details"),
+            makeRow("Inspector’s Name", data.inspector_name),
+            makeRow("Signature", data.inspector_signature),
+            makeRow("Port of Entry", data.port_of_entry),
+            new Paragraph({ children: [
+              new TextRun({ text: "Date: ", bold: true }), new TextRun(data.inspection_date || ""),
+              new TextRun({ text: " Time: ", bold: true }), new TextRun(data.inspection_time || "")
+            ]}),
+
+            new Paragraph({ text: "Endorsing Officer (for restricted hazardous materials / waste)", bold: true }),
+            makeRow("Name of Inspector", data.endorse1_name),
+            makeRow("Signature", data.endorse1_signature),
+            new Paragraph({ children: [
+              new TextRun({ text: "Date: ", bold: true }), new TextRun(data.endorse1_date || ""),
+              new TextRun({ text: " Time: ", bold: true }), new TextRun(data.endorse1_time || "")
+            ]}),
+            makeRow("Inspection Comments", data.endorse1_comments),
+
+            new Paragraph({ text: "Endorsing Officer (Final Destination)", bold: true }),
+            makeRow("Name of Inspector", data.endorse2_name),
+            makeRow("Signature", data.endorse2_signature),
+            new Paragraph({ children: [
+              new TextRun({ text: "Date: ", bold: true }), new TextRun(data.endorse2_date
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
